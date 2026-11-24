@@ -1,0 +1,33 @@
+module Datapath_32bit (
+input wire clk,
+input wire we,
+input wire [4:0] rs1,
+input wire [4:0] rs2,
+input wire [4:0] rd,
+input wire [1:0] alu_ctrl,
+output wire [31:0] result
+);
+wire [31:0] rd1;
+wire [31:0] rd2;
+wire [31:0] alu_out;
+wire cout_ignore;
+assign result = alu_out;
+register_file reg_files(
+.rd1(rd1),
+.rd2(rd2),
+.wd(alu_out),
+.rs1(rs1),
+.rs2(rs2),
+.rd(rd),
+.clk(clk),
+.we(we)
+);
+alu_32bit alu_mid(
+.A(rd1),
+.B(rd2),
+.cin(1'b0),
+.result(alu_out),
+.cout(cout_ignore),
+.s(alu_ctrl)
+);
+endmodule

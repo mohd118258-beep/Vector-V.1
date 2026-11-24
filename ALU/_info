@@ -1,0 +1,329 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning
+valu_1bit
+Z1 !s110 1795536575
+!i10b 1
+!s100 7Di[o:W=eZz;fL:FCZoLR0
+IlELb`:d1Fc?dW_4>OBFW12
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+w1795534949
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_1bit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_1bit.v
+L0 1
+Z3 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z4 !s108 1795536575.000000
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_1bit.v|
+!s90 -reportprogress|300|-work|ALU|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_1bit.v|
+!i113 1
+Z5 o-work ALU
+Z6 tCvgOpt 0
+valu_32bit
+R1
+!i10b 1
+!s100 l1DM55:jA[47AX80@g1<Q2
+Ic18EY=ZnHcl7Kl[9;```G3
+R2
+R0
+w1795534991
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_32bit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_32bit.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_32bit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/alu_32bit.v|
+!i113 1
+Z7 o-work work
+R6
+vcontrol_unit
+Z8 !s110 1795536576
+!i10b 1
+!s100 jd4;aQhP^NdBC<=L5gLJo3
+Ik=KjTM;e2SfYNE:cB6kTe1
+R2
+R0
+w1795533869
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/control_unit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/control_unit.v
+L0 1
+R3
+r1
+!s85 0
+31
+Z9 !s108 1795536576.000000
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/control_unit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/control_unit.v|
+!i113 1
+R7
+R6
+vd_flip_flop
+R1
+!i10b 1
+!s100 UGjIkkO=<znz1Tdme4QCV0
+IH<a7U_B6dO23jF8g`V[dR1
+R2
+R0
+w1791883055
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/d_flip_flop.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/d_flip_flop.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/d_flip_flop.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/d_flip_flop.v|
+!i113 1
+R7
+R6
+vDatapath_32bit
+R1
+!i10b 1
+!s100 kZ1^agn[1HeQ0CQSc=Fd@0
+I[Cdl:mT2neA3n?3YIo3<[2
+R2
+R0
+w1795251786
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Datapath_32bit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Datapath_32bit.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Datapath_32bit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Datapath_32bit.v|
+!i113 1
+R7
+R6
+n@datapath_32bit
+vfetch_unit
+R8
+!i10b 1
+!s100 35L`Y2U:`7YKLjVldlC4a2
+I5hoJ1G@RMWcKKffTe<j3J2
+R2
+R0
+w1793878155
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/fetch_unit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/fetch_unit.v
+L0 1
+R3
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/fetch_unit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/fetch_unit.v|
+!i113 1
+R7
+R6
+vFull_adder
+R1
+!i10b 1
+!s100 Zki5aPA[F_S?l?@I8a[F_0
+IzA=Jf5UHPYGnL0UcjXodR0
+R2
+R0
+w1791815778
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Full_adder.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Full_adder.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Full_adder.v|
+!s90 -reportprogress|300|-work|ALU|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Full_adder.v|
+!i113 1
+R5
+R6
+n@full_adder
+vinstruction_memory
+R8
+!i10b 1
+!s100 3;18LAQ:N;ebZ]Xa@EmHi3
+ImMZazP]k2B2Y=PgFMS_OB1
+R2
+R0
+w1795535757
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/instruction_memory.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/instruction_memory.v
+L0 1
+R3
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/instruction_memory.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/instruction_memory.v|
+!i113 1
+R7
+R6
+vmux2to1
+R1
+!i10b 1
+!s100 E`l`zzJ7LLnO`D_=2Je0m3
+Ik@_a6gG[MEVRG09IGL`2f2
+R2
+R0
+w1791889585
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/mux2to1.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/mux2to1.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/mux2to1.v|
+!s90 -reportprogress|300|-work|ALU|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/mux2to1.v|
+!i113 1
+R5
+R6
+vpc_plus_4
+R8
+!i10b 1
+!s100 f=afG`A;Mo4X?cJ;T[R`_3
+Ikc4>Hb;@lmWmgRRYQ8ZAo3
+R2
+R0
+w1793526448
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/pc_plus_4.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/pc_plus_4.v
+L0 1
+R3
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/pc_plus_4.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/pc_plus_4.v|
+!i113 1
+R7
+R6
+vProgram_counter
+R8
+!i10b 1
+!s100 ?;F[Y14`LJinYQ07SL6db2
+IVE=0jm>ah8DlDe0zQMeA^1
+R2
+R0
+w1793525816
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Program_counter.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Program_counter.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Program_counter.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Program_counter.v|
+!i113 1
+R7
+R6
+n@program_counter
+vregister_32bit
+R1
+!i10b 1
+!s100 >ne^5=kih1cDB[n<S4HTf3
+I>]ioE^zd7TcZjd>m3?]h52
+R2
+R0
+w1791883984
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_32bit.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_32bit.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_32bit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_32bit.v|
+!i113 1
+R7
+R6
+vregister_file
+R1
+!i10b 1
+!s100 D?18S<R9j>K;<hF2l3O:S1
+IE052PFz5@C`nK[O@YZ9>B2
+R2
+R0
+w1795535341
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_file.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_file.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_file.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/register_file.v|
+!i113 1
+R7
+R6
+vriscv_tb
+R8
+!i10b 1
+!s100 N2JM<S0hj8RTWT<bOo=2h3
+I@KDhOz@TWjY4YffYFW<Ki3
+R2
+R0
+w1795536571
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/riscv_tb.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/riscv_tb.v
+L0 1
+R3
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/riscv_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/riscv_tb.v|
+!i113 1
+R7
+R6
+vRiscv_top
+R8
+!i10b 1
+!s100 ^V@GA3gld_iFbEP7SJebE0
+I3Efn<^]gi^DA^b90D8a`<3
+R2
+R0
+w1795533894
+8C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Riscv_top.v
+FC:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Riscv_top.v
+L0 1
+R3
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Riscv_top.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/mohammad/Desktop/Computer Engineering/projects/RISC-V Learning/Riscv_top.v|
+!i113 1
+R7
+R6
+n@riscv_top

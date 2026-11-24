@@ -1,0 +1,35 @@
+module Riscv_top (
+input wire clk,
+input wire reset,
+output wire [31:0] pc_out,
+output wire [31:0] instruction_out,
+output wire [31:0] alu_result_out
+);
+fetch_unit FU(
+.clk(clk),
+.reset(reset),
+.instruction_out(instruction_out),
+.current_pc(pc_out)
+);
+wire RegWrite;
+wire [2:0] ALUControl;
+wire ALUSrc;
+control_unit CU(
+.funct7_bit(instruction_out [30]),
+.opcode (instruction_out [6:0]),
+.alu_sc (ALUSrc),
+.alu_ctrl(ALUControl),
+.reg_wire (RegWrite)
+);
+Datapath_32bit DP(
+.alu_ctrl(ALUControl),
+.clk(clk),
+.reset(reset),
+.we (RegWrite),
+.result (alu_result_out),
+.rd (instruction_out [11:7]),
+.rs1(instruction_out [19:15]),
+.rs2 (instruction_out [24:20])
+);
+
+endmodule 

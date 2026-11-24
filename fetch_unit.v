@@ -1,0 +1,22 @@
+module fetch_unit(
+input wire clk,
+input wire reset,
+output wire [31:0] current_pc,
+output wire [31:0] instruction_out
+);
+wire [31:0] next_address;
+Program_counter pc_reg(
+.clk(clk),
+.reset(reset),
+.pc_next(next_address),
+.pc_out(current_pc)
+);
+pc_plus_4 pc_add(
+.pc_in(current_pc),
+.pc_next(next_address)
+);
+instruction_memory in_me(
+.pc_address(current_pc),
+.instruction(instruction_out)
+);
+endmodule

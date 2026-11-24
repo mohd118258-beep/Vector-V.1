@@ -1,0 +1,38 @@
+module alu_1bit (
+
+ input wire A,
+ 
+ input wire B,
+
+ input wire cin,
+
+ input wire [1:0] S,
+
+ output wire Y,
+
+ output wire cout
+
+);
+ 
+wire sum_out;
+wire b_mod;
+assign b_mod = B ^ s[0];
+ Full_adder adder_unit (
+
+ .A(A), 
+ .B(b_mod),
+ .SUM(sum_out),
+ .cin(cin),
+ .cout(cout)
+
+);
+
+mux2to1 mux_unit (
+
+ .A(S[1]),
+ .x1(B),
+ .x0(sum_out),
+ .X(Y)
+
+);
+endmodule 
