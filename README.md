@@ -8,6 +8,7 @@
 A modular, structural **32-bit RISC-V (RV32I)** processor designed from scratch in **Verilog HDL** using gate-level and structural RTL building blocks, verified in **ModelSim** with a self-checking scoreboard testbench.
 
 ---
+[![Live 3D Showcase](https://img.shields.io/badge/Live_3D_Showcase-Launch_Interactive_Chip-00d2ff?style=for-the-badge)](https://mohd118258-beep.github.io/Vector-V.1/index.html)
 
 ## Microarchitecture Overview
 
