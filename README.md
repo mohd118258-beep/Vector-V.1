@@ -62,8 +62,6 @@ Verified in **ModelSim - Intel FPGA Edition** across 6 consecutive clock cycles 
 | `0x10` | `add x6, x0, x2` | `0 + 4` | Confirms `x0` stayed `0` after overwrite attempt | `4` | `4` | PASS |
 | `0x14` | `nop` (`addi x0,x0,0`) | `0 + 0` | Clean idle bus state (`X`-free waveform) | `0` | `0` | PASS |
 
-### Simulation Waveform
-![Vector-V.1 Self-Checking Stress Test Waveform](assets/1_v1_stress_test_waveform.png)
 
 ---
 
