@@ -107,9 +107,6 @@
             <button onclick="toggleModal('modalBugs')" class="px-3 py-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition text-xs font-semibold flex items-center gap-1.5">
                 <i class="fa-solid fa-bug"></i> الأخطاء الـ 5
             </button>
-            <button onclick="toggleModal('modalGuide')" class="px-3 py-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition text-xs font-semibold flex items-center gap-1.5">
-                <i class="fa-brands fa-linkedin"></i> دليل النشر
-            </button>
         </div>
     </header>
 
@@ -342,54 +339,6 @@
                         <strong>الحل:</strong> وضع تعليمة `NOP` (`32'h00000013`) بآخر الخانات لإبقاء خطوط الناقل مستقرة وخضراء.
                     </p>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: LINKEDIN & GITHUB PUBLISHING GUIDE -->
-    <div id="modalGuide" class="hidden fixed inset-0 z-50 glass-hud flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full p-6 space-y-5 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold">
-                        <i class="fa-brands fa-linkedin"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-bold text-slate-100">كيف تنشر هذا المشروع على GitHub و LinkedIn؟</h2>
-                        <p class="text-xs text-slate-400">خطوات استضافة المجسم 3D وكتابة منشور احترافي يبرز مهاراتك</p>
-                    </div>
-                </div>
-                <button onclick="toggleModal('modalGuide')" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="space-y-3 text-xs leading-relaxed text-slate-300">
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
-                    <h4 class="font-bold text-cyan-400 text-sm">1. استضافة مجانية فورية على GitHub Pages:</h4>
-                    <p>ارفع ملف <code>vector_v1_showcase.html</code> إلى مستودع (Repository) على GitHub وقم بتسميته <code>index.html</code>. من إعدادات المستودع <code>Settings -> Pages</code> اختر الفرع <code>main</code> وحفظ. ستحصل على رابط حي ومباشر للمجسم الثلاثي الأبعاد!</p>
-                </div>
-
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
-                    <h4 class="font-bold text-emerald-400 text-sm">2. التقاط الصور عالية الدقة (HD Snapshots):</h4>
-                    <p>اضغط على زر <strong>"التقاط صورة HD PNG"</strong> في الشريط العلوي لتحميل لقطات سينمائية خلفيتها سوداء ناعمة لتضمينها داخل ملف <code>README.md</code> وفي منشور لينكد إن.</p>
-                </div>
-
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
-                    <h4 class="font-bold text-amber-400 text-sm">3. هيكل منشور LinkedIn المُوصى به:</h4>
-                    <p class="font-mono text-[11px] text-slate-400 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                        🚀 Excited to introduce Vector-V.1: A 32-bit RISC-V (RV32I) Single-Cycle Core built entirely from scratch in Verilog HDL!<br><br>
-                        🔧 Key Architectural Highlights:<br>
-                        - Structural 32-bit ALU with 32 parallel 1-bit full adder slices.<br>
-                        - Hardware-enforced x0 zero register write protection.<br>
-                        - 100% self-checking testbench with zero simulation errors in ModelSim.<br><br>
-                        🌐 Try the Live Interactive 3D Silicon Showcase here: [YOUR_GITHUB_PAGES_LINK]
-                    </p>
-                </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-800 flex justify-end">
-                <button onclick="toggleModal('modalGuide')" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition">
-                    تم، فهمت الخطوات!
-                </button>
             </div>
         </div>
     </div>
@@ -691,7 +640,7 @@
         const mouse = new THREE.Vector2();
 
         window.addEventListener('click', (e) => {
-            if (e.target.closest('#inspectorPanel') || e.target.closest('header') || e.target.closest('.glass-hud') || e.target.closest('#modalBugs') || e.target.closest('#modalGuide')) return;
+            if (e.target.closest('#inspectorPanel') || e.target.closest('header') || e.target.closest('.glass-hud') || e.target.closest('#modalBugs')) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
