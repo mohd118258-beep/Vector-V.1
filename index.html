@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector-V.1 — Ultra 3D Processor Showcase & Verification Suite</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cairo & Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    colors: {
+                        darkBg: '#070b14',
+                        cardBg: '#0e1526',
+                        cyanNeon: '#00f3ff',
+                        emeraldNeon: '#10b981',
+                        amberNeon: '#f59e0b',
+                        crimsonNeon: '#ef4444',
+                        purpleNeon: '#a855f7',
+                        goldLeaf: '#fbbf24'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #070b14;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        .glass-hud {
+            background: rgba(14, 21, 38, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .neon-glow-cyan { filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5)); }
+        .neon-glow-amber { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #070b14; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
+
+        input[type=range] {
+            accent-color: #00f3ff;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden select-none">
+
+    <!-- Header Nav -->
+    <header class="glass-hud h-16 px-6 flex items-center justify-between z-20 border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-cyan-500/20">
+                V1
+            </div>
+            <div>
+                <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-200 to-white flex items-center gap-2">
+                    Vector-V.1 <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-700/50 font-mono">32-bit RV32I Single-Cycle</span>
+                </h1>
+                <p class="text-xs text-slate-400">عارض 3D تفاعلي ومحاكي التحقق من الهاردوير • Silicon 3D Interactive RTL</p>
+            </div>
+        </div>
+
+        <!-- Camera Views & Tools -->
+        <div class="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 text-xs">
+            <span class="text-slate-400 px-2 font-semibold">زاوية الكاميرا:</span>
+            <button onclick="setCameraView('iso')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-cyan-950 hover:text-cyan-400 text-slate-300 transition border border-slate-700">
+                <i class="fa-solid fa-cube ml-1"></i> منظوري (Iso)
+            </button>
+            <button onclick="setCameraView('top')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-cyan-950 hover:text-cyan-400 text-slate-300 transition border border-slate-700">
+                <i class="fa-solid fa-table-cells ml-1"></i> علوي (Top Die)
+            </button>
+            <button onclick="setCameraView('alu')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-cyan-950 hover:text-cyan-400 text-slate-300 transition border border-slate-700">
+                <i class="fa-solid fa-microchip ml-1"></i> تقريب ALU
+            </button>
+            <div class="h-4 w-px bg-slate-800 mx-1"></div>
+            <button id="btnAutoRotate" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-950 hover:text-purple-400 text-slate-300 transition border border-slate-700">
+                <i class="fa-solid fa-rotate ml-1"></i> دوران تلقائي
+            </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+            <button id="btnTakePNG" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold transition text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-camera"></i> التقاط صورة HD PNG
+            </button>
+            <button onclick="toggleModal('modalBugs')" class="px-3 py-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition text-xs font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-bug"></i> الأخطاء الـ 5
+            </button>
+            <button onclick="toggleModal('modalGuide')" class="px-3 py-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition text-xs font-semibold flex items-center gap-1.5">
+                <i class="fa-brands fa-linkedin"></i> دليل النشر
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 relative overflow-hidden flex">
+
+        <!-- 3D WebGL Canvas -->
+        <div id="canvas-container" class="w-full h-full relative cursor-grab active:cursor-grabbing">
+            <canvas id="three-canvas" class="w-full h-full block"></canvas>
+
+            <!-- Bottom Floating Control Overlay: Explode Slider -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 glass-hud px-6 py-3 rounded-2xl border border-slate-700/80 shadow-2xl flex items-center gap-4 z-10">
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
+                    <i class="fa-solid fa-layer-group text-cyan-400"></i>
+                    <span>تفكيك الشريحة (Exploded View):</span>
+                </div>
+                <input id="rangeExplode" type="range" min="0" max="100" value="0" class="w-48 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                <span id="lblExplodeVal" class="text-xs font-mono font-bold text-cyan-400 w-8">0%</span>
+            </div>
+        </div>
+
+        <!-- Left HUD: Execution Stepper & Live Register File -->
+        <div class="w-96 glass-hud border-r border-slate-800/80 p-5 flex flex-col justify-between z-10 shrink-0 h-full overflow-y-auto">
+            
+            <div class="space-y-4">
+                <!-- Stepper Title -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="font-bold text-slate-100 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-cyan-400"></i> محاكي اختبار الإجهاد (ModelSim)
+                        </h2>
+                        <p class="text-[11px] text-slate-400">تتبع تنفيذ التعليمات الست خطوة بخطوة</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold font-mono">
+                        ERRORS: 0
+                    </span>
+                </div>
+
+                <!-- Stepper Controls -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button id="btnPrevCycle" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition text-xs font-semibold flex items-center justify-center border border-slate-700">
+                        <i class="fa-solid fa-backward ml-1"></i> السابقة
+                    </button>
+                    <button id="btnPlayPause" class="col-span-2 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold transition text-xs shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+                        <i id="iconPlay" class="fa-solid fa-play"></i> <span id="txtPlay">تشغيل تلقائي</span>
+                    </button>
+                    <button id="btnNextCycle" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition text-xs font-semibold flex items-center justify-center border border-slate-700">
+                        التالية <i class="fa-solid fa-forward mr-1"></i>
+                    </button>
+                </div>
+
+                <!-- Current Cycle Telemetry Card -->
+                <div class="bg-slate-950 p-4 rounded-2xl border border-cyan-500/30 space-y-2 relative overflow-hidden">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-mono">الدورة <span id="lblCycleNum" class="text-cyan-400 font-bold text-sm">0</span> / 5</span>
+                        <span id="lblPC" class="font-mono text-cyan-300 bg-slate-900 px-2 py-0.5 rounded text-[11px] border border-slate-800">PC: 0x00</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[10px] text-slate-400 block">التعليمة المنفذة (Assembly & Machine Code):</span>
+                        <div id="lblInstruction" class="font-mono text-sm font-bold text-amber-300 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 text-center tracking-wide">
+                            add x3, x1, x2 (0x002081B3)
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800/80">
+                        <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">هدف الفحص:</span>
+                            <span id="lblCornerCase" class="text-[11px] font-semibold text-slate-200 block truncate">جمع R-Type طبيعي</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">ناتج الـ ALU:</span>
+                            <span id="lblALUOut" class="text-xs font-mono font-bold text-emerald-400 block">14 (32'd14)</span>
+                        </div>
+                    </div>
+
+                    <!-- x0 Write Guard Trigger Banner -->
+                    <div id="bannerX0Guard" class="hidden bg-amber-500/20 border border-amber-500/50 p-2 rounded-xl text-[11px] text-amber-300 font-bold text-center flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-amber-400 text-sm"></i>
+                        <span>حظر الكتابة! السجل x0 محمي بالهاردوير (0🔒)</span>
+                    </div>
+                </div>
+
+                <!-- Live Registers Monitor (x0 .. x6) -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-200"><i class="fa-solid fa-database text-emerald-400 ml-1"></i> قيم السجلات الحية (Register File):</span>
+                        <span class="text-[10px] text-slate-400 font-mono">32 x 32-bit</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                        <div id="cardX0" class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x0 (ZERO):</span>
+                            <span class="text-amber-400 font-bold">0 🔒</span>
+                        </div>
+                        <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x1 (val1):</span>
+                            <span class="text-slate-200 font-bold">10</span>
+                        </div>
+                        <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x2 (val2):</span>
+                            <span class="text-slate-200 font-bold">4</span>
+                        </div>
+                        <div id="cardX3" class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x3:</span>
+                            <span id="valX3" class="text-cyan-400 font-bold">14</span>
+                        </div>
+                        <div id="cardX4" class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x4:</span>
+                            <span id="valX4" class="text-slate-400 font-bold">0</span>
+                        </div>
+                        <div id="cardX5" class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x5:</span>
+                            <span id="valX5" class="text-slate-400 font-bold">0</span>
+                        </div>
+                        <div id="cardX6" class="col-span-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400">x6 (تأكيد x0):</span>
+                            <span id="valX6" class="text-slate-400 font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer info -->
+            <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <div class="flex justify-between">
+                    <span>المعالج: <strong class="text-slate-200 font-mono">Vector-V.1</strong></span>
+                    <span class="text-emerald-400 font-mono">ModelSim Verified</span>
+                </div>
+                <p class="text-[10px] text-slate-500">تم بناء جميع الوحدات هيكلياً (Structural RTL) في Verilog</p>
+            </div>
+        </div>
+
+        <!-- Right Side Inspector Overlay (Triggered by 3D Object Click) -->
+        <div id="inspectorPanel" class="hidden absolute top-6 left-6 glass-hud p-5 rounded-2xl border border-cyan-500/40 w-80 text-xs shadow-2xl z-30">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <span id="inspectIcon" class="w-3 h-3 rounded-full bg-cyan-400"></span>
+                    <h3 id="inspectTitle" class="font-bold text-sm text-slate-100">اسم الوحدة</h3>
+                </div>
+                <button onclick="closeInspector()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-slate-400 block mb-1">ملف الـ Verilog RTL:</span>
+                    <code id="inspectFile" class="font-mono text-cyan-300 bg-slate-950 px-2 py-1 rounded block text-[11px] border border-slate-800">file.v</code>
+                </div>
+                <div>
+                    <span class="text-slate-400 block mb-1">طريقة العمل والوظيفة:</span>
+                    <p id="inspectDesc" class="text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">الشرح...</p>
+                </div>
+                <div>
+                    <span class="text-slate-400 block mb-1">المنافذ والبوابات:</span>
+                    <div id="inspectPorts" class="font-mono text-[10px] text-emerald-400 bg-slate-950 p-2 rounded-xl border border-slate-900 space-y-1">
+                        <!-- Ports -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: BUGS & SOLUTIONS -->
+    <div id="modalBugs" class="hidden fixed inset-0 z-50 glass-hud flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-bug"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-100">سجل الأخطاء والتصحيح (Debugging & Verification)</h2>
+                        <p class="text-xs text-slate-400">المشاكل الـ 5 التي واجهتنا أثناء البناء وكيف تجاوزناها في ModelSim</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('modalBugs')" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-3 text-xs">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-red-500/30 space-y-1.5">
+                    <div class="flex justify-between items-center font-bold text-red-400">
+                        <span>1. مشكلة ناتج الجمع (4 بدل 14) وغياب الطرح</span>
+                        <span class="font-mono text-[10px] bg-red-950 px-2 py-0.5 rounded">alu_1bit.v</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        <strong>السبب:</strong> إشارة اختيار الموّزع S كانت 1-bit فقط ومربوطة لتمريير المدخل B بشكل دائم عند `0`.<br>
+                        <strong>الحل:</strong> توسيع التحكم لـ 2-bit (`S[1:0]`) وإضافة بوابة XOR مع `S[0]` وتمرير `carryIn = S[0]` لتنفيذ متمم الاثنين ($A - B = A + \sim B + 1$).
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 space-y-1.5">
+                    <div class="flex justify-between items-center font-bold text-amber-400">
+                        <span>2. إشارة التحكم المعلقة (alu_ctrl = X باللون الأحمر)</span>
+                        <span class="font-mono text-[10px] bg-amber-950 px-2 py-0.5 rounded">control_unit.v</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        <strong>السبب:</strong> شرط فحص `funct7[30]` كان موضوعاً بالخطأ داخل تعليمات القيم الفورية I-Type بدل R-Type، وغياب تغطية `default:` كاملة.<br>
+                        <strong>الحل:</strong> تصحيح موقع الشرط تحت `opcode == 7'b0110011` وتغطية كافة المخارج في `default: alu_ctrl = 2'b00;` لتجنب توليد Latch.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-cyan-500/30 space-y-1.5">
+                    <div class="flex justify-between items-center font-bold text-cyan-400">
+                        <span>3. ثغرة الكتابة فوق السجل الصفري (x0 Overwrite Vulnerability)</span>
+                        <span class="font-mono text-[10px] bg-cyan-950 px-2 py-0.5 rounded">register_file.v</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        <strong>السبب:</strong> غياب شرط يمنع كتابة البيانات إذا كان عنوان السجل المستهدف `rd == 5'd0`.<br>
+                        <strong>الحل:</strong> حماية هاردوير مستقيمة `if (we && rd != 5'd0) registers[rd] <= wd;` تجعل السجل `x0` ثابتاً على الصفر دوماً.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-purple-500/30 space-y-1.5">
+                    <div class="flex justify-between items-center font-bold text-purple-400">
+                        <span>4. خطأ توقيت المحاكاة في ModelSim وقراءة العينات</span>
+                        <span class="font-mono text-[10px] bg-purple-950 px-2 py-0.5 rounded">riscv_tb.v</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        <strong>السبب:</strong> زر Run الافتراضي يمشي 100ps وهي غير كافية للدورة، وقراءة قيم السجلات عند حافة الصعود بالضبط كشفت Race Condition.<br>
+                        <strong>الحل:</strong> أخذ العيّنات بفارق زمني في منتصف النصف السالب للساعة (`#3` بعد `posedge clk`) لضمان استقرار الإشارات.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-emerald-500/30 space-y-1.5">
+                    <div class="flex justify-between items-center font-bold text-emerald-400">
+                        <span>5. خطوط البيانات المجهولة (XXXX) بآخر الذاكرة</span>
+                        <span class="font-mono text-[10px] bg-emerald-950 px-2 py-0.5 rounded">instruction_memory.v</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        <strong>السبب:</strong> وصول عداد الرمز `PC` لخانات غير محددة بالذاكرة بعد انتهاء البرنامج.<br>
+                        <strong>الحل:</strong> وضع تعليمة `NOP` (`32'h00000013`) بآخر الخانات لإبقاء خطوط الناقل مستقرة وخضراء.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: LINKEDIN & GITHUB PUBLISHING GUIDE -->
+    <div id="modalGuide" class="hidden fixed inset-0 z-50 glass-hud flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold">
+                        <i class="fa-brands fa-linkedin"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-100">كيف تنشر هذا المشروع على GitHub و LinkedIn؟</h2>
+                        <p class="text-xs text-slate-400">خطوات استضافة المجسم 3D وكتابة منشور احترافي يبرز مهاراتك</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('modalGuide')" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs leading-relaxed text-slate-300">
+                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
+                    <h4 class="font-bold text-cyan-400 text-sm">1. استضافة مجانية فورية على GitHub Pages:</h4>
+                    <p>ارفع ملف <code>vector_v1_showcase.html</code> إلى مستودع (Repository) على GitHub وقم بتسميته <code>index.html</code>. من إعدادات المستودع <code>Settings -> Pages</code> اختر الفرع <code>main</code> وحفظ. ستحصل على رابط حي ومباشر للمجسم الثلاثي الأبعاد!</p>
+                </div>
+
+                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
+                    <h4 class="font-bold text-emerald-400 text-sm">2. التقاط الصور عالية الدقة (HD Snapshots):</h4>
+                    <p>اضغط على زر <strong>"التقاط صورة HD PNG"</strong> في الشريط العلوي لتحميل لقطات سينمائية خلفيتها سوداء ناعمة لتضمينها داخل ملف <code>README.md</code> وفي منشور لينكد إن.</p>
+                </div>
+
+                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1">
+                    <h4 class="font-bold text-amber-400 text-sm">3. هيكل منشور LinkedIn المُوصى به:</h4>
+                    <p class="font-mono text-[11px] text-slate-400 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                        🚀 Excited to introduce Vector-V.1: A 32-bit RISC-V (RV32I) Single-Cycle Core built entirely from scratch in Verilog HDL!<br><br>
+                        🔧 Key Architectural Highlights:<br>
+                        - Structural 32-bit ALU with 32 parallel 1-bit full adder slices.<br>
+                        - Hardware-enforced x0 zero register write protection.<br>
+                        - 100% self-checking testbench with zero simulation errors in ModelSim.<br><br>
+                        🌐 Try the Live Interactive 3D Silicon Showcase here: [YOUR_GITHUB_PAGES_LINK]
+                    </p>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="toggleModal('modalGuide')" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition">
+                    تم، فهمت الخطوات!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- THREE.JS SCENE SETUP SCRIPT -->
+    <script>
+        // --- DATASET: ModelSim Verified Cycles ---
+        const cyclesData = [
+            {
+                cycle: 0,
+                pc: '0x00',
+                instHex: '0x002081B3',
+                instruction: 'add x3, x1, x2',
+                cornerCase: 'جمع R-Type (10 + 4)',
+                aluOut: 14,
+                activeReg: 'x3',
+                x0Attempt: false,
+                regValues: { x3: 14, x4: 0, x5: 0, x6: 0 },
+                activeBlocks: ['fetch', 'imem', 'control', 'rf', 'alu'],
+                activeBus: 'all'
+            },
+            {
+                cycle: 1,
+                pc: '0x04',
+                instHex: '0x40208233',
+                instruction: 'sub x4, x1, x2',
+                cornerCase: 'طرح بمتمم الاثنين (10 - 4)',
+                aluOut: 6,
+                activeReg: 'x4',
+                x0Attempt: false,
+                regValues: { x3: 14, x4: 6, x5: 0, x6: 0 },
+                activeBlocks: ['fetch', 'imem', 'control', 'rf', 'alu'],
+                activeBus: 'all'
+            },
+            {
+                cycle: 2,
+                pc: '0x08',
+                instHex: '0x00208033',
+                instruction: 'add x0, x1, x2',
+                cornerCase: 'اختبار محاولة كتابة x0',
+                aluOut: 14,
+                activeReg: 'x0',
+                x0Attempt: true, // Trigger Guard Banner & Shield Effect
+                regValues: { x3: 14, x4: 6, x5: 0, x6: 0 },
+                activeBlocks: ['fetch', 'imem', 'control', 'rf', 'alu'],
+                activeBus: 'all'
+            },
+            {
+                cycle: 3,
+                pc: '0x0C',
+                instHex: '0x403102B3',
+                instruction: 'sub x5, x2, x3',
+                cornerCase: 'طرح موجب من أكبر (4 - 14)',
+                aluOut: -10,
+                activeReg: 'x5',
+                x0Attempt: false,
+                regValues: { x3: 14, x4: 6, x5: -10, x6: 0 },
+                activeBlocks: ['fetch', 'imem', 'control', 'rf', 'alu'],
+                activeBus: 'all'
+            },
+            {
+                cycle: 4,
+                pc: '0x10',
+                instHex: '0x00200333',
+                instruction: 'add x6, x0, x2',
+                cornerCase: 'تأكيد ثبات x0 على 0 (0 + 4)',
+                aluOut: 4,
+                activeReg: 'x6',
+                x0Attempt: false,
+                regValues: { x3: 14, x4: 6, x5: -10, x6: 4 },
+                activeBlocks: ['fetch', 'imem', 'control', 'rf', 'alu'],
+                activeBus: 'all'
+            },
+            {
+                cycle: 5,
+                pc: '0x14',
+                instHex: '0x00000013',
+                instruction: 'nop (addi x0, x0, 0)',
+                cornerCase: 'تعليمة أمان بالنهاية (Idle)',
+                aluOut: 0,
+                activeReg: null,
+                x0Attempt: false,
+                regValues: { x3: 14, x4: 6, x5: -10, x6: 4 },
+                activeBlocks: ['imem', 'control'],
+                activeBus: 'none'
+            }
+        ];
+
+        let currentCycle = 0;
+        let isPlaying = false;
+        let playTimer = null;
+        let explodeVal = 0;
+        let autoRotate = false;
+
+        // --- Three.js Setup ---
+        const container = document.getElementById('canvas-container');
+        const canvas = document.getElementById('three-canvas');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070b14);
+        scene.fog = new THREE.FogExp2(0x070b14, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(12, 10, 14);
+
+        // WebGLRenderer with preserveDrawingBuffer enabled for high-res PNG capturing
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true,
+            preserveDrawingBuffer: true
+        });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.02;
+
+        // --- Lights & Floor Grid ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        dirLight.position.set(12, 20, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const cyanRim = new THREE.PointLight(0x00f3ff, 1.5, 25);
+        cyanRim.position.set(-8, 6, -8);
+        scene.add(cyanRim);
+
+        const amberRim = new THREE.PointLight(0xf59e0b, 1.2, 25);
+        amberRim.position.set(8, 6, 8);
+        scene.add(amberRim);
+
+        const gridHelper = new THREE.GridHelper(30, 30, 0x1e293b, 0x0f172a);
+        gridHelper.position.y = -0.4;
+        scene.add(gridHelper);
+
+        // --- Main Chip Root Group ---
+        const chipGroup = new THREE.Group();
+        scene.add(chipGroup);
+
+        // 1. Emerald PCB Board
+        const pcbGeo = new THREE.BoxGeometry(15, 0.4, 15);
+        const pcbMat = new THREE.MeshStandardMaterial({ color: 0x064e3b, roughness: 0.4, metalness: 0.3 });
+        const pcbMesh = new THREE.Mesh(pcbGeo, pcbMat);
+        pcbMesh.position.y = -0.2;
+        chipGroup.add(pcbMesh);
+
+        // Gold Pins array
+        const pinGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8);
+        const pinMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
+        for (let i = -6.5; i <= 6.5; i += 1.0) {
+            const p1 = new THREE.Mesh(pinGeo, pinMat); p1.position.set(i, 0, 7.2); chipGroup.add(p1);
+            const p2 = new THREE.Mesh(pinGeo, pinMat); p2.position.set(i, 0, -7.2); chipGroup.add(p2);
+            const p3 = new THREE.Mesh(pinGeo, pinMat); p3.position.set(7.2, 0, i); chipGroup.add(p3);
+            const p4 = new THREE.Mesh(pinGeo, pinMat); p4.position.set(-7.2, 0, i); chipGroup.add(p4);
+        }
+
+        // 2. Matte Black IC Substrate Body
+        const dieBaseGeo = new THREE.BoxGeometry(11, 0.4, 11);
+        const dieBaseMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.7, metalness: 0.5 });
+        const dieBaseMesh = new THREE.Mesh(dieBaseGeo, dieBaseMat);
+        dieBaseMesh.position.y = 0.2;
+        chipGroup.add(dieBaseMesh);
+
+        // 3. Translucent Glass Cover Lid
+        const glassGeo = new THREE.BoxGeometry(11.2, 1.2, 11.2);
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0x00f3ff,
+            transparent: true,
+            opacity: 0.18,
+            roughness: 0.1,
+            metalness: 0.1,
+            transmission: 0.8
+        });
+        const glassMesh = new THREE.Mesh(glassGeo, glassMat);
+        glassMesh.position.y = 1.2;
+        chipGroup.add(glassMesh);
+
+        // --- 3D Architecture Modules ---
+        const modulesMeta = {
+            fetch: {
+                name: 'وحدة الجلب والعداد (Fetch Unit & PC)',
+                file: 'fetch_unit.v',
+                desc: 'تتكون من عداد البرنامج (PC Register) وجامع محاذاة PC+4. تقرأ العنوان الحالي وتزيده بـ 4 بايت مع كل نبضة ساعة.',
+                ports: ['input clk, reset', 'output [31:0] pc_out'],
+                color: 0x00f3ff,
+                size: [2.6, 0.7, 2.6],
+                pos: [-3.2, 0.75, -3.2]
+            },
+            imem: {
+                name: 'ذاكرة التعليمات (Instruction Memory 64x32)',
+                file: 'instruction_memory.v',
+                desc: 'ذاكرة ROM توافقية مخزن بها كود الآلة (Machine Code). تأخذ عنوان PC محاذى الكلمات pc[7:2] وتخرج أمر 32-bit.',
+                ports: ['input [31:0] pc_address', 'output [31:0] instruction'],
+                color: 0xa855f7,
+                size: [2.6, 0.7, 4.2],
+                pos: [-3.2, 0.75, 1.6]
+            },
+            control: {
+                name: 'وحدة التحكم والتفكيك (Control Unit)',
+                file: 'control_unit.v',
+                desc: 'دائرة توافقية تحلل Opcode و Funct7 وتنتج إشارات التحكم لمسار البيانات بدون أي Latches معلقة.',
+                ports: ['input [6:0] opcode', 'input funct7_bit', 'output reg_wire, alu_sc, [1:0] alu_ctrl'],
+                color: 0xf59e0b,
+                size: [2.4, 0.7, 2.4],
+                pos: [0.2, 0.75, -3.2]
+            },
+            rf: {
+                name: 'بنك السجلات (Register File 32x32)',
+                file: 'register_file.v',
+                desc: 'مصفوفة 32 سجل بعرض 32-bit. قراءة فورية مزدوجة وكتابة متزامنة. تتضمن حماية هاردوير مستقيمة تمنع تعديل x0.',
+                ports: ['input clk, we', 'input [4:0] rs1, rs2, rd', 'input [31:0] wd', 'output [31:0] rd1, rd2'],
+                color: 0x10b981,
+                size: [3.2, 0.7, 3.8],
+                pos: [0.5, 0.75, 1.6]
+            },
+            alu: {
+                name: 'وحدة ALU الهيكلية (32-bit Structural ALU)',
+                file: 'alu_32bit.v & alu_1bit.v',
+                desc: 'وحدة حساب ومنطق مبنية هيكلياً من 32 شريحة 1-bit ALU مع بوابات Full Adder و XOR لدعم متمم الاثنين للطرح.',
+                ports: ['input [31:0] a, b', 'input [1:0] alu_ctrl', 'output [31:0] result'],
+                color: 0xef4444,
+                size: [3.8, 0.9, 5.4],
+                pos: [4.2, 0.85, -0.6]
+            }
+        };
+
+        const moduleMeshes = {};
+
+        Object.keys(modulesMeta).forEach(key => {
+            const m = modulesMeta[key];
+            const geo = new THREE.BoxGeometry(...m.size);
+            const mat = new THREE.MeshStandardMaterial({
+                color: m.color,
+                roughness: 0.3,
+                metalness: 0.4,
+                emissive: m.color,
+                emissiveIntensity: 0.2
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(...m.pos);
+            mesh.userData = { id: key, baseY: m.pos[1], ...m };
+            chipGroup.add(mesh);
+            moduleMeshes[key] = mesh;
+
+            // ALU Details: 32 bit-slice chips
+            if (key === 'alu') {
+                for (let i = 0; i < 32; i++) {
+                    const sliceGeo = new THREE.BoxGeometry(0.08, 0.15, 0.12);
+                    const sliceMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+                    const sliceMesh = new THREE.Mesh(sliceGeo, sliceMat);
+                    sliceMesh.position.set(-1.6 + (i * 0.1), 0.5, (i % 2 === 0 ? 0.3 : -0.3));
+                    mesh.add(sliceMesh);
+                }
+            }
+
+            // Register File Details: Golden x0 Shield Bar on top
+            if (key === 'rf') {
+                const shieldGeo = new THREE.BoxGeometry(3.0, 0.12, 0.4);
+                const shieldMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.1 });
+                const shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
+                shieldMesh.position.set(0, 0.42, -1.4);
+                shieldMesh.name = 'x0ShieldMesh';
+                mesh.add(shieldMesh);
+            }
+        });
+
+        // --- Data Flow Bus Pulses (Particle Systems) ---
+        const particleCurves = [
+            new THREE.CatmullRomCurve3([new THREE.Vector3(-3.2, 0.8, -1.9), new THREE.Vector3(-3.2, 0.8, -0.5)]), // PC -> IMEM
+            new THREE.CatmullRomCurve3([new THREE.Vector3(-1.9, 0.8, -3.2), new THREE.Vector3(-1.0, 0.8, -3.2)]), // IMEM -> Control
+            new THREE.CatmullRomCurve3([new THREE.Vector3(0.2, 0.8, -2.0), new THREE.Vector3(0.5, 0.8, -0.3)]),   // Control -> RF
+            new THREE.CatmullRomCurve3([new THREE.Vector3(2.1, 0.8, 1.6), new THREE.Vector3(4.2, 0.8, 1.6), new THREE.Vector3(4.2, 0.8, 2.1)]), // RF -> ALU
+            new THREE.CatmullRomCurve3([new THREE.Vector3(4.2, 0.8, -3.3), new THREE.Vector3(0.5, 0.8, -3.3), new THREE.Vector3(0.5, 0.8, -0.3)])  // ALU -> RF Writeback
+        ];
+
+        const particleGroup = new THREE.Group();
+        chipGroup.add(particleGroup);
+
+        const particleGeo = new THREE.SphereGeometry(0.1, 8, 8);
+        const particleMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff });
+        const particles = [];
+
+        particleCurves.forEach(curve => {
+            const pMesh = new THREE.Mesh(particleGeo, particleMat);
+            particleGroup.add(pMesh);
+            particles.push({ mesh: pMesh, curve: curve, progress: Math.random() });
+        });
+
+        // --- Raycasting Inspector Click ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('#inspectorPanel') || e.target.closest('header') || e.target.closest('.glass-hud') || e.target.closest('#modalBugs') || e.target.closest('#modalGuide')) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(Object.values(moduleMeshes));
+
+            if (intersects.length > 0) {
+                const target = intersects[0].object;
+                openInspector(target.userData);
+            }
+        });
+
+        function openInspector(data) {
+            document.getElementById('inspectTitle').innerText = data.name;
+            document.getElementById('inspectFile').innerText = data.file;
+            document.getElementById('inspectDesc').innerText = data.desc;
+            document.getElementById('inspectIcon').style.backgroundColor = '#' + data.color.toString(16).padStart(6, '0');
+            
+            const portsContainer = document.getElementById('inspectPorts');
+            portsContainer.innerHTML = data.ports.map(p => `<div>• ${p}</div>`).join('');
+
+            document.getElementById('inspectorPanel').classList.remove('hidden');
+
+            Object.values(moduleMeshes).forEach(m => m.material.emissiveIntensity = 0.2);
+            moduleMeshes[data.id].material.emissiveIntensity = 0.8;
+        }
+
+        function closeInspector() {
+            document.getElementById('inspectorPanel').classList.add('hidden');
+            Object.values(moduleMeshes).forEach(m => m.material.emissiveIntensity = 0.2);
+        }
+
+        // --- Stepper Logic ---
+        function updateCycleUI(idx) {
+            const c = cyclesData[idx];
+            document.getElementById('lblCycleNum').innerText = c.cycle;
+            document.getElementById('lblPC').innerText = `PC: ${c.pc}`;
+            document.getElementById('lblInstruction').innerText = `${c.instruction} (${c.instHex})`;
+            document.getElementById('lblCornerCase').innerText = c.cornerCase;
+            document.getElementById('lblALUOut').innerText = `${c.aluOut} (32'd${c.aluOut})`;
+
+            // Live registers
+            document.getElementById('valX3').innerText = c.regValues.x3;
+            document.getElementById('valX4').innerText = c.regValues.x4;
+            document.getElementById('valX5').innerText = c.regValues.x5;
+            document.getElementById('valX6').innerText = c.regValues.x6;
+
+            // x0 Protection Banner & Shield Effect
+            const banner = document.getElementById('bannerX0Guard');
+            const cardX0 = document.getElementById('cardX0');
+            const shieldMesh = moduleMeshes['rf'].getObjectByName('x0ShieldMesh');
+
+            if (c.x0Attempt) {
+                banner.classList.remove('hidden');
+                cardX0.className = "bg-amber-500/20 p-2 rounded-xl border border-amber-500/60 flex justify-between items-center neon-glow-amber transition-all";
+                if (shieldMesh) shieldMesh.material.color.setHex(0xff0000);
+            } else {
+                banner.classList.add('hidden');
+                cardX0.className = "bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center";
+                if (shieldMesh) shieldMesh.material.color.setHex(0xfbbf24);
+            }
+
+            // Emissive block highlighting
+            Object.keys(moduleMeshes).forEach(k => {
+                if (c.activeBlocks.includes(k)) {
+                    moduleMeshes[k].material.emissiveIntensity = 0.7;
+                } else {
+                    moduleMeshes[k].material.emissiveIntensity = 0.15;
+                }
+            });
+        }
+
+        document.getElementById('btnNextCycle').addEventListener('click', () => {
+            currentCycle = (currentCycle + 1) % cyclesData.length;
+            updateCycleUI(currentCycle);
+        });
+
+        document.getElementById('btnPrevCycle').addEventListener('click', () => {
+            currentCycle = (currentCycle - 1 + cyclesData.length) % cyclesData.length;
+            updateCycleUI(currentCycle);
+        });
+
+        document.getElementById('btnPlayPause').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            const icon = document.getElementById('iconPlay');
+            const txt = document.getElementById('txtPlay');
+
+            if (isPlaying) {
+                icon.className = 'fa-solid fa-pause';
+                txt.innerText = 'إيقاف مؤقت';
+                playTimer = setInterval(() => {
+                    currentCycle = (currentCycle + 1) % cyclesData.length;
+                    updateCycleUI(currentCycle);
+                }, 2200);
+            } else {
+                icon.className = 'fa-solid fa-play';
+                txt.innerText = 'تشغيل تلقائي';
+                clearInterval(playTimer);
+            }
+        });
+
+        // --- Camera Presets ---
+        function setCameraView(preset) {
+            if (preset === 'iso') {
+                camera.position.set(12, 10, 14);
+                controls.target.set(0, 0, 0);
+            } else if (preset === 'top') {
+                camera.position.set(0, 16, 0.1);
+                controls.target.set(0, 0, 0);
+            } else if (preset === 'alu') {
+                camera.position.set(4.2, 4.0, 4.0);
+                controls.target.set(4.2, 0.85, -0.6);
+            }
+        }
+
+        // Auto-Rotate toggle
+        document.getElementById('btnAutoRotate').addEventListener('click', () => {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+            controls.autoRotateSpeed = 2.0;
+            document.getElementById('btnAutoRotate').classList.toggle('bg-purple-900/60');
+        });
+
+        // Explode Slider
+        const rangeExplode = document.getElementById('rangeExplode');
+        rangeExplode.addEventListener('input', (e) => {
+            explodeVal = parseFloat(e.target.value) / 100;
+            document.getElementById('lblExplodeVal').innerText = `${e.target.value}%`;
+        });
+
+        // --- HD Snapshot PNG Capture ---
+        document.getElementById('btnTakePNG').addEventListener('click', () => {
+            renderer.render(scene, camera);
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `Vector_V1_3D_Processor_Snapshot.png`;
+            link.href = dataURL;
+            link.click();
+        });
+
+        // Modal Toggles
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Explode Lerp logic
+            const glassTargetY = 1.2 + (explodeVal * 4.0);
+            glassMesh.position.y += (glassTargetY - glassMesh.position.y) * 0.1;
+            glassMesh.material.opacity = 0.18 * (1 - explodeVal * 0.7);
+
+            Object.keys(moduleMeshes).forEach((key, idx) => {
+                const mesh = moduleMeshes[key];
+                const baseY = mesh.userData.baseY;
+                const targetY = baseY + (explodeVal * (1.2 + idx * 0.4));
+                mesh.position.y += (targetY - mesh.position.y) * 0.1;
+            });
+
+            // Particles Flow along Bus
+            particles.forEach(p => {
+                p.progress += 0.008;
+                if (p.progress > 1) p.progress = 0;
+                const pt = p.curve.getPoint(p.progress);
+                p.mesh.position.copy(pt);
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        window.onload = function() {
+            updateCycleUI(0);
+            animate();
+        };
+    </script>
+</body>
+</html>
